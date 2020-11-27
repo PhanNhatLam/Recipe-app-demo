@@ -86,7 +86,7 @@ public class DBqueries {
                                     }
                                     homePageModelList.add(new HomePageModel(2, documentSnapshot.get("layout_title").toString(), gridLayoutModelList));
 
-                                }else if ((long) documentSnapshot.get("view_type") == 3) {
+                                } else if ((long) documentSnapshot.get("view_type") == 3) {
 
 //                                    List<HorizontalItemScrollModel> horizontalItemScrollModelList = new ArrayList<>();
 //                                    List<FavoriteModel> favoriteModelList = new ArrayList<>();
