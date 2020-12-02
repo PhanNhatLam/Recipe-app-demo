@@ -11,10 +11,16 @@ import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
+import static vn.edu.vhu.phannhatlam.recipecooking.DBqueries.lists;
+import static vn.edu.vhu.phannhatlam.recipecooking.DBqueries.loadFragmentData;
+import static vn.edu.vhu.phannhatlam.recipecooking.DBqueries.loadedCategoriesNames;
 
 public class CategoryActivity extends AppCompatActivity {
 
     private RecyclerView categoryRecyclerView;
+    private HomePageAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,54 +34,25 @@ public class CategoryActivity extends AppCompatActivity {
 
         categoryRecyclerView = findViewById(R.id.category_recyclerview);
 
-
-        ////// Banner Slider
-//        List<SliderModel> sliderModelList = new ArrayList<SliderModel>();
-
-//        sliderModelList.add(new SliderModel(R.drawable.banner7, "#F0F0F0FA"));
-//        sliderModelList.add(new SliderModel(R.drawable.banner8, "#F0F0F0FA"));
-//        sliderModelList.add(new SliderModel(R.drawable.banner, "#F0F0F0FA"));
-//
-//        sliderModelList.add(new SliderModel(R.drawable.banner2, "#F0F0F0FA"));
-//        sliderModelList.add(new SliderModel(R.drawable.banner3, "#F0F0F0FA"));
-//        sliderModelList.add(new SliderModel(R.drawable.banner4, "#F0F0F0FA"));
-//        sliderModelList.add(new SliderModel(R.drawable.banner5, "#F0F0F0FA"));
-//        sliderModelList.add(new SliderModel(R.drawable.banner6, "#F0F0F0FA"));
-//        sliderModelList.add(new SliderModel(R.drawable.banner7, "#F0F0F0FA"));
-//
-//        sliderModelList.add(new SliderModel(R.drawable.banner8, "#F0F0F0FA"));
-//        sliderModelList.add(new SliderModel(R.drawable.banner, "#F0F0F0FA"));
-//        sliderModelList.add(new SliderModel(R.drawable.banner2, "#F0F0F0FA"));
-        ////// Banner Slider
-
-
-        ////// Horizontal Item Layout
-//        List<HorizontalItemScrollModel> horizontalItemScrollModelList = new ArrayList<>();
-//        horizontalItemScrollModelList.add(new HorizontalItemScrollModel(R.drawable.banner, "Salab đậu hũ chiên", "bởi ABC Cook", "Thời gian: 30 phút"));
-//        horizontalItemScrollModelList.add(new HorizontalItemScrollModel(R.drawable.banner2, "Salab đậu hũ chiên", "bởi ABC Cook", "Thời gian: 30 phút"));
-//        horizontalItemScrollModelList.add(new HorizontalItemScrollModel(R.drawable.banner3, "Salab đậu hũ chiên", "bởi ABC Cook", "Thời gian: 30 phút"));
-//        horizontalItemScrollModelList.add(new HorizontalItemScrollModel(R.drawable.banner4, "Salab đậu hũ chiên", "bởi ABC Cook", "Thời gian: 30 phút"));
-//        horizontalItemScrollModelList.add(new HorizontalItemScrollModel(R.drawable.banner5, "Salab đậu hũ chiên", "bởi ABC Cook", "Thời gian: 30 phút"));
-//        horizontalItemScrollModelList.add(new HorizontalItemScrollModel(R.drawable.banner6, "Salab đậu hũ chiên", "bởi ABC Cook", "Thời gian: 30 phút"));
-//        horizontalItemScrollModelList.add(new HorizontalItemScrollModel(R.drawable.banner7, "Salab đậu hũ chiên", "bởi ABC Cook", "Thời gian: 30 phút"));
-//        horizontalItemScrollModelList.add(new HorizontalItemScrollModel(R.drawable.banner8, "Salab đậu hũ chiên", "bởi ABC Cook", "Thời gian: 30 phút"));
-        ////// Horizontal Item Layout
-
-
-        //////////////////////////
         LinearLayoutManager testingLayoutManager = new LinearLayoutManager(this);
         testingLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         categoryRecyclerView.setLayoutManager(testingLayoutManager);
 
-        List<HomePageModel> homePageModelList = new ArrayList<>();
-//        homePageModelList.add(new HomePageModel(0, sliderModelList));
-//        homePageModelList.add(new HomePageModel(1, "Món ngon mỗi ngày", horizontalItemScrollModelList));
-//        homePageModelList.add(new HomePageModel(1, "Món ngon mỗi tuần", horizontalItemScrollModelList));
-//        homePageModelList.add(new HomePageModel(2, "Công thức chung", horizontalItemScrollModelList));
-//        homePageModelList.add(new HomePageModel(0, sliderModelList));
-//        homePageModelList.add(new HomePageModel(2, "Công thức chung", horizontalItemScrollModelList));
+        int listPosition = 0;
+        for (int x = 0; x < loadedCategoriesNames.size(); x++) {
+            if (loadedCategoriesNames.get(x).equals(title.toUpperCase(Locale.ENGLISH))) {
+                listPosition = x;
+            }
+        }
+        if (listPosition == 0) {
+            loadedCategoriesNames.add(title.toUpperCase(Locale.ENGLISH));
+            lists.add(new ArrayList<HomePageModel>());
+            adapter = new HomePageAdapter(lists.get(loadedCategoriesNames.size() - 1));
+            loadFragmentData(adapter, this, loadedCategoriesNames.size() - 1, title);
+        } else {
+            adapter = new HomePageAdapter(lists.get(listPosition));
+        }
 
-        HomePageAdapter adapter = new HomePageAdapter(homePageModelList);
         categoryRecyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

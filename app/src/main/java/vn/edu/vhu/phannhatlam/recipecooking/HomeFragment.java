@@ -34,9 +34,11 @@ import java.util.TimerTask;
 
 import static vn.edu.vhu.phannhatlam.recipecooking.DBqueries.categoryModelList;
 import static vn.edu.vhu.phannhatlam.recipecooking.DBqueries.firebaseFirestore;
-import static vn.edu.vhu.phannhatlam.recipecooking.DBqueries.homePageModelList;
+import static vn.edu.vhu.phannhatlam.recipecooking.DBqueries.lists;
+import static vn.edu.vhu.phannhatlam.recipecooking.DBqueries.lists;
 import static vn.edu.vhu.phannhatlam.recipecooking.DBqueries.loadCategories;
 import static vn.edu.vhu.phannhatlam.recipecooking.DBqueries.loadFragmentData;
+import static vn.edu.vhu.phannhatlam.recipecooking.DBqueries.loadedCategoriesNames;
 
 public class HomeFragment extends Fragment {
 
@@ -109,15 +111,17 @@ public class HomeFragment extends Fragment {
             LinearLayoutManager testingLayoutManager = new LinearLayoutManager(getContext());
             testingLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             homePageRecyclerView.setLayoutManager(testingLayoutManager);
-            adapter = new HomePageAdapter(homePageModelList);
-            homePageRecyclerView.setAdapter(adapter);
 
-            if (homePageModelList.size() == 0) {
-                loadFragmentData(adapter, getContext());
+            if (lists.size() == 0) {
+                loadedCategoriesNames.add("HOME");
+                lists.add(new ArrayList<HomePageModel>());
+                adapter = new HomePageAdapter(lists.get(0));
+                loadFragmentData(adapter, getContext(), 0, "Home");
             } else {
-                categoryAdapter.notifyDataSetChanged();
+                adapter = new HomePageAdapter(lists.get(0));
+                adapter.notifyDataSetChanged();
             }
-
+            homePageRecyclerView.setAdapter(adapter);
         } else {
             Glide.with(this).load(R.drawable.loading).into(noInternetConnection);
             noInternetConnection.setVisibility(View.VISIBLE);

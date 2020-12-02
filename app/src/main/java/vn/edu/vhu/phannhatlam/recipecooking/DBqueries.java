@@ -13,12 +13,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class DBqueries {
 
     public static FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     public static List<CategoryModel> categoryModelList = new ArrayList<>();
-    public static List<HomePageModel> homePageModelList = new ArrayList<>();
+
+    public static List<List<HomePageModel>> lists = new ArrayList<>();
+    public static List<String> loadedCategoriesNames = new ArrayList<>();
 
     public static void loadCategories(final CategoryAdapter categoryAdapter, final Context context) {
 
@@ -40,9 +43,9 @@ public class DBqueries {
 
     }
 
-    public static void loadFragmentData(final HomePageAdapter adapter, final Context context) {
+    public static void loadFragmentData(final HomePageAdapter adapter, final Context context, final int index, String categoryName) {
         firebaseFirestore.collection("CATEGORIES")
-                .document("HOME")
+                .document(categoryName.toUpperCase(Locale.ENGLISH))
                 .collection("HOT_NEWS").orderBy("index").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -58,7 +61,7 @@ public class DBqueries {
                                         sliderModelList.add(new SliderModel(documentSnapshot.get("banner_" + x).toString()
                                                 , documentSnapshot.get("banner_" + x + "_background").toString()));
                                     }
-                                    homePageModelList.add(new HomePageModel(0, sliderModelList));
+                                    lists.get(index).add(new HomePageModel(0, sliderModelList));
                                 } else if ((long) documentSnapshot.get("view_type") == 1) {
 
                                     List<HorizontalItemScrollModel> horizontalItemScrollModelList = new ArrayList<>();
@@ -71,7 +74,7 @@ public class DBqueries {
                                                 ,documentSnapshot.get("recipe_time_" + x).toString()));
 
                                     }
-                                    homePageModelList.add(new HomePageModel(1, documentSnapshot.get("layout_title").toString(), horizontalItemScrollModelList));
+                                    lists.get(index).add(new HomePageModel(1, documentSnapshot.get("layout_title").toString(), horizontalItemScrollModelList));
 
                                 } else if ((long) documentSnapshot.get("view_type") == 2) {
 
@@ -84,7 +87,7 @@ public class DBqueries {
                                                 ,documentSnapshot.get("recipe_subtitle_" + x).toString()
                                                 ,documentSnapshot.get("recipe_time_" + x).toString()));
                                     }
-                                    homePageModelList.add(new HomePageModel(2, documentSnapshot.get("layout_title").toString(), gridLayoutModelList));
+                                    lists.get(index).add(new HomePageModel(2, documentSnapshot.get("layout_title").toString(), gridLayoutModelList));
 
                                 } else if ((long) documentSnapshot.get("view_type") == 3) {
 
@@ -106,7 +109,7 @@ public class DBqueries {
 //                                                ,documentSnapshot.get("recipe_time_" +x).toString()));
 //
 //                                    }
-//                                    homePageModelList.add(new HomePageModel(3, documentSnapshot.get("layout_title").toString(), horizontalItemScrollModelList, favoriteModelList));
+//                                    lists.get(index).add(new HomePageModel(3, documentSnapshot.get("layout_title").toString(), horizontalItemScrollModelList, favoriteModelList));
                                 }
                             }
                             adapter.notifyDataSetChanged();
