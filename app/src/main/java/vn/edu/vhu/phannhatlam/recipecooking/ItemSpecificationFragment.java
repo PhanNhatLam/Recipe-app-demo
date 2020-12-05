@@ -21,6 +21,8 @@ public class ItemSpecificationFragment extends Fragment {
     }
 
     private RecyclerView itemSpecificationRecyclerView;
+    public List<ItemSpecificationModel> itemSpecificationModelList;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,12 +37,12 @@ public class ItemSpecificationFragment extends Fragment {
 
         itemSpecificationRecyclerView.setLayoutManager(linearLayoutManager);
 
-        List<ItemSpecificationModel> itemSpecificationModelList = new ArrayList<>();
-        itemSpecificationModelList.add(new ItemSpecificationModel(0, "Bước thực hiện"));
-        itemSpecificationModelList.add(new ItemSpecificationModel(1, "Bước 1", "A"));
-        itemSpecificationModelList.add(new ItemSpecificationModel(1, "Bước 2", "B"));
-        itemSpecificationModelList.add(new ItemSpecificationModel(1, "Bước 3", "C"));
-        itemSpecificationModelList.add(new ItemSpecificationModel(1, "Bước 4", "D"));
+
+//        itemSpecificationModelList.add(new ItemSpecificationModel(0, "Bước thực hiện"));
+//        itemSpecificationModelList.add(new ItemSpecificationModel(1, "Bước 1", "A"));
+//        itemSpecificationModelList.add(new ItemSpecificationModel(1, "Bước 2", "B"));
+//        itemSpecificationModelList.add(new ItemSpecificationModel(1, "Bước 3", "C"));
+//        itemSpecificationModelList.add(new ItemSpecificationModel(1, "Bước 4", "D"));
 
 
         ItemSpecificationAdapter itemSpecificationAdapter = new ItemSpecificationAdapter(itemSpecificationModelList);

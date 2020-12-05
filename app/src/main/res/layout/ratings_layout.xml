@@ -89,7 +89,7 @@
             android:layout_weight="1"
             android:max="100"
             android:progress="50"
-            android:progressTint="#00FF6F" />
+            android:progressTint="#08FF00" />
 
         <ProgressBar
             android:id="@+id/progressBar2"
@@ -101,10 +101,10 @@
             android:layout_weight="1"
             android:max="100"
             android:progress="50"
-            android:progressTint="#00FF0F" />
+            android:progressTint="#00FFEA" />
 
         <ProgressBar
-            android:id="@+id/progressBa3r"
+            android:id="@+id/progressBar3"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -113,7 +113,7 @@
             android:layout_weight="1"
             android:max="100"
             android:progress="50"
-            android:progressTint="#ffbb00" />
+            android:progressTint="#FFFB00" />
 
         <ProgressBar
             android:id="@+id/progressBar4"
@@ -125,7 +125,7 @@
             android:layout_weight="1"
             android:max="100"
             android:progress="50"
-            android:progressTint="#ff0" />
+            android:progressTint="#ffbb00" />
 
         <ProgressBar
             android:id="@+id/progressBar5"

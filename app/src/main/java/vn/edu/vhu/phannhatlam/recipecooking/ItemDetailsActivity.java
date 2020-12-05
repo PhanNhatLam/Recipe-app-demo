@@ -1,7 +1,9 @@
 package vn.edu.vhu.phannhatlam.recipecooking;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewpager.widget.ViewPager;
 
 import android.app.Dialog;
@@ -16,9 +18,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,17 +37,39 @@ import static vn.edu.vhu.phannhatlam.recipecooking.RegisterActivity.setSignUpFra
 public class ItemDetailsActivity extends AppCompatActivity {
 
     private ViewPager itemImagesViewPager;
+    private TextView itemTitle;
+    private TextView averageRatingMiniView;
+    private TextView totalRatingMiniView;
+    private TextView itemTime;
     private TabLayout viewpagerIndicator;
 
+
+    ////// recipe description
+    private ConstraintLayout itemDetailsOnlyContainer;
+    private ConstraintLayout itemDetailsTabsContainer;
     private ViewPager itemDetailsViewpager;
     private TabLayout itemDetailsTablayout;
+    private TextView itemOnlyDescriptionBody;
+
+    private List<ItemSpecificationModel> itemSpecificationModelList  = new ArrayList<>();
+    private String itemDescription;
+    private String itemOtherDetails;
+    ////// recipe description
+
 
     ////// ratings layout
     private LinearLayout rateNowContainer;
+    private TextView totalRatings;
+    private LinearLayout ratingsNumbersContainer;
+    private TextView totalRatingsFigure;
+    private LinearLayout ratingsProgressBarContainer;
+    private TextView averageRating;
     ////// ratings layout
 
     private static boolean ALREADY_ADDED_TO_FAVORITE = false;
     private FloatingActionButton addToFavoriteBtn;
+
+    private FirebaseFirestore firebaseFirestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,15 +85,83 @@ public class ItemDetailsActivity extends AppCompatActivity {
         addToFavoriteBtn = findViewById(R.id.add_to_favorite_btn);
         itemDetailsViewpager = findViewById(R.id.item_details_viewpager);
         itemDetailsTablayout = findViewById(R.id.item_details_tablayout);
+        itemTitle = findViewById(R.id.item_title);
+        averageRatingMiniView = findViewById(R.id.tv_item_rating_miniview);
+        totalRatingMiniView = findViewById(R.id.total_ratings_miniview);
+        itemTime = findViewById(R.id.item_time);
+        itemDetailsTabsContainer = findViewById(R.id.item_details_tabs_container);
+        itemDetailsOnlyContainer = findViewById(R.id.item_details_container);
+        itemOnlyDescriptionBody = findViewById(R.id.item_details_body);
+        totalRatings = findViewById(R.id.total_ratings);
+        ratingsNumbersContainer = findViewById(R.id.ratings_numbers_container);
+        totalRatingsFigure = findViewById(R.id.total_ratings_figure);
+        ratingsProgressBarContainer = findViewById(R.id.ratings_progressbar_container);
+        averageRating = findViewById(R.id.average_rating);
 
-        List<Integer> itemImages = new ArrayList<>();
-        itemImages.add(R.drawable.banner);
-        itemImages.add(R.drawable.banner6);
-        itemImages.add(R.drawable.banner3);
-        itemImages.add(R.drawable.banner2);
+        firebaseFirestore = FirebaseFirestore.getInstance();
 
-        ItemImagesAdapter itemImagesAdapter = new ItemImagesAdapter(itemImages);
-        itemImagesViewPager.setAdapter(itemImagesAdapter);
+        final List<String> itemImages = new ArrayList<>();
+
+        firebaseFirestore.collection("RECIPES").document("5xCuwQti2eSKh6VXh2sC")
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot documentSnapshot = task.getResult();
+
+                    for (long x = 1; x < (long) documentSnapshot.get("number_of_recipe_images") + 1; x++) {
+                        itemImages.add(String.valueOf(documentSnapshot.get("recipe_image_" + x)));
+                    }
+                    ItemImagesAdapter itemImagesAdapter = new ItemImagesAdapter(itemImages);
+                    itemImagesViewPager.setAdapter(itemImagesAdapter);
+
+                    itemTitle.setText(documentSnapshot.get("recipe_title").toString());
+                    averageRatingMiniView.setText(documentSnapshot.get("average_rating").toString());
+                    totalRatingMiniView.setText("(" + (long) documentSnapshot.get("total_ratings") + ") đánh giá");
+                    itemTime.setText("Thời gian: " + String.valueOf(documentSnapshot.get("recipe_time")) + " phút");
+
+                    if ((boolean) documentSnapshot.get("use_tab_layout")) {
+                        itemDetailsTabsContainer.setVisibility(View.VISIBLE);
+                        itemDetailsOnlyContainer.setVisibility(View.GONE);
+                        itemDescription = documentSnapshot.get("recipe_description").toString();
+
+                        itemOtherDetails = documentSnapshot.get("recipe_other_details").toString();
+
+                        for (long x = 1; x < (long) documentSnapshot.get("total_spec_titles") + 1; x++) {
+                            itemSpecificationModelList.add(new ItemSpecificationModel(0, String.valueOf(documentSnapshot.get("spec_title_" + x))));
+                            for (long y = 1; y < ((long) documentSnapshot.get("spec_title_" + x + "_total_fields")) + 1; y++) {
+                                itemSpecificationModelList.add(new ItemSpecificationModel(1, String.valueOf(documentSnapshot.get("spec_title_" + x + "_field_" + y +"_name")), String.valueOf(documentSnapshot.get("spec_title_" + x + "_field_" + y +"_value"))));
+                            }
+                        }
+
+                    } else {
+                        itemDetailsTabsContainer.setVisibility(View.GONE);
+                        itemDetailsOnlyContainer.setVisibility(View.VISIBLE);
+                        itemOnlyDescriptionBody.setText(String.valueOf(documentSnapshot.get("recipe_description")));
+                    }
+
+                    totalRatings.setText((long) documentSnapshot.get("total_ratings") + " đánh giá");
+
+                    for (int x = 0; x < 5; x++) {
+                        TextView rating = (TextView) ratingsNumbersContainer.getChildAt(x);
+                        rating.setText(String.valueOf((long) documentSnapshot.get((5 - x) + "_star")));
+
+                        ProgressBar progressBar = (ProgressBar) ratingsProgressBarContainer.getChildAt(x);
+                        int maxProgress = Integer.parseInt(String.valueOf((long) documentSnapshot.get("total_ratings")));
+                        progressBar.setMax(maxProgress);
+                        progressBar.setProgress(Integer.parseInt(String.valueOf((long) documentSnapshot.get((5 - x) + "_star"))));
+                    }
+
+                    totalRatingsFigure.setText(String.valueOf((long) documentSnapshot.get("total_ratings")));
+                    averageRating.setText(String.valueOf(documentSnapshot.get("average_rating")));
+                    itemDetailsViewpager.setAdapter(new ItemDetailsAdapter(getSupportFragmentManager(), itemDetailsTablayout.getTabCount(), itemDescription, itemOtherDetails, itemSpecificationModelList));
+
+                } else {
+                    String error = task.getException().getLocalizedMessage();
+                    Toast.makeText(ItemDetailsActivity.this, error, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         viewpagerIndicator.setupWithViewPager(itemImagesViewPager, true);
 
@@ -108,7 +207,6 @@ public class ItemDetailsActivity extends AppCompatActivity {
             }
         });
 
-        itemDetailsViewpager.setAdapter(new ItemDetailsAdapter(getSupportFragmentManager(), itemDetailsTablayout.getTabCount()));
 
         itemDetailsViewpager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(itemDetailsTablayout));
         itemDetailsTablayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
